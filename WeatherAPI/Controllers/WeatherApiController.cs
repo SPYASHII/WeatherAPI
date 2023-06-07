@@ -1,14 +1,9 @@
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR.Protocol;
-using System.Runtime.InteropServices.ComTypes;
-using WeatherAPI.Models;
-using WeatherAPI.Constant;
-using WeatherAPI.Services;
 using MongoDB.Driver;
-using MongoDB.Bson;
-using static MongoDB.Driver.WriteConcern;
 using System.Text.Json;
+using WeatherAPI.Constant;
+using WeatherAPI.Models;
+using WeatherAPI.Services;
 
 namespace WeatherAPI.Controllers
 {
@@ -62,9 +57,9 @@ namespace WeatherAPI.Controllers
         }
 
         [HttpGet("weather/find/{location}/{weather}")]
-        public async Task<IActionResult> GetDayByWeather(string location, string weather)
+        public async Task<IActionResult> GetDayByWeather(string location, string weather, int days = 14)
         {
-            ForecastWeatherData responseContent = await _requestService.GetForecastWeatherDataAsync(location, 14);
+            ForecastWeatherData responseContent = await _requestService.GetForecastWeatherDataAsync(location, days);
             if (responseContent != null)
             {
                 var day = FindDayByWeather(responseContent, weather);
@@ -113,12 +108,12 @@ namespace WeatherAPI.Controllers
         {
             try
             {
-                    var filter = Builders<UserData>.Filter.Eq(user => user.ChatId, chatId);
-                    var user = await Constants.usersCollection.Find(filter).FirstOrDefaultAsync();
-                    if (user != null)
-                        return Ok(user);
-                    else
-                        return NotFound();
+                var filter = Builders<UserData>.Filter.Eq(user => user.ChatId, chatId);
+                var user = await Constants.usersCollection.Find(filter).FirstOrDefaultAsync();
+                if (user != null)
+                    return Ok(user);
+                else
+                    return NotFound();
 
             }
             catch (Exception ex)
@@ -201,13 +196,13 @@ namespace WeatherAPI.Controllers
 
                 if (gptd != null)
                     updates.Add(Builders<UserData>.Update.Set(user => user.gptByDate, gptd));
-                
+
                 if (waitD != null)
                     updates.Add(Builders<UserData>.Update.Set(user => user.waitingForDays, waitD));
-                
+
                 if (waitT != null)
                     updates.Add(Builders<UserData>.Update.Set(user => user.waitingForTime, waitT));
-                
+
                 if (waitW != null)
                     updates.Add(Builders<UserData>.Update.Set(user => user.waitingForWeather, waitW));
 

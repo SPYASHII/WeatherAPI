@@ -1,6 +1,5 @@
-﻿using WeatherAPI.Models;
-using MongoDB.Driver;
-using MongoDB.Bson;
+﻿using MongoDB.Driver;
+using WeatherAPI.Models;
 
 namespace WeatherAPI.Constant
 {

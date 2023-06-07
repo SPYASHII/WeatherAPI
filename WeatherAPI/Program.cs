@@ -1,8 +1,7 @@
 using MongoDB.Driver;
-using System.Reflection.Metadata;
-using WeatherAPI.Services;
 using WeatherAPI.Constant;
 using WeatherAPI.Models;
+using WeatherAPI.Services;
 internal class Program
 {
     private static void Main(string[] args)

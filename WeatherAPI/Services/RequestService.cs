@@ -1,5 +1,4 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using OpenAI_API;
+﻿using OpenAI_API;
 using System.Text.Json;
 using WeatherAPI.Constant;
 using WeatherAPI.Models;
@@ -24,7 +23,7 @@ namespace WeatherAPI.Services
 
             if (response.IsSuccessStatusCode)
             {
-                CurrentWeatherData responseContent =  await JsonSerializer.DeserializeAsync<CurrentWeatherData>(response.Content.ReadAsStream());
+                CurrentWeatherData responseContent = await JsonSerializer.DeserializeAsync<CurrentWeatherData>(response.Content.ReadAsStream());
                 return responseContent;
             }
 
@@ -37,7 +36,7 @@ namespace WeatherAPI.Services
 
             if (response.IsSuccessStatusCode)
             {
-                ForecastWeatherData responseContent =  await JsonSerializer.DeserializeAsync<ForecastWeatherData>(response.Content.ReadAsStream());
+                ForecastWeatherData responseContent = await JsonSerializer.DeserializeAsync<ForecastWeatherData>(response.Content.ReadAsStream());
                 return responseContent;
             }
 
@@ -47,18 +46,26 @@ namespace WeatherAPI.Services
         {
             if (date.Count() != 10)
                 throw new ArgumentException($"Wrong format of string date {date}. Must be date in format yyyy-mm-dd");
-            var dateArr = date.Split('-',3);
+            var dateArr = date.Split('-', 3);
             int year = int.Parse(dateArr[0]);
             int month = int.Parse(dateArr[1]);
             int day = int.Parse(dateArr[2]);
 
-            string time = "future";
-            if (DateTime.Now.Date.CompareTo(new DateTime(year,month,day).Date) > 0)
+            string time;
+            try
             {
-                time = "history";
+                time = "future";
+                if (DateTime.Now.Date.CompareTo(new DateTime(year, month, day).Date) > 0)
+                {
+                    time = "history";
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Get, Constants.weatherApiUrl + time +".json?key=" + Constants.weatherApiKey + "&q=" + location + "&dt=" + date + "&lang=uk");
+            var request = new HttpRequestMessage(HttpMethod.Get, Constants.weatherApiUrl + time + ".json?key=" + Constants.weatherApiKey + "&q=" + location + "&dt=" + date + "&lang=uk");
             var response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
@@ -142,7 +149,7 @@ namespace WeatherAPI.Services
             {
                 List<Location> responseContent = await JsonSerializer.DeserializeAsync<List<Location>>(response.Content.ReadAsStream());
 
-                if(responseContent.Count > 0)
+                if (responseContent.Count > 0)
                     return true;
                 else
                     return false;
